@@ -1,0 +1,4 @@
+interface:
+  display_name: "Codex Browser Modes"
+  short_description: "Silent and visible browser automation for Codex"
+  default_prompt: "Use $browser-modes to automate this page silently or in visible cursor mode."

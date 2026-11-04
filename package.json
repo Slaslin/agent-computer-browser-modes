@@ -1,0 +1,24 @@
+{
+  "name": "codex-browser-modes",
+  "version": "0.1.0",
+  "description": "Dual-mode Edge automation for Codex: silent headless browsing and a visible recording-friendly cursor.",
+  "author": "KukudTian",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/kukudTian/codex-browser-modes.git"
+  },
+  "type": "module",
+  "private": true,
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "install-skill": "node scripts/install.mjs",
+    "test": "node scripts/smoke-test.mjs",
+    "validate": "node scripts/validate.mjs"
+  },
+  "dependencies": {
+    "@playwright/mcp": "0.0.83"
+  }
+}

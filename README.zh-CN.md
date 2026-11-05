@@ -1,7 +1,7 @@
 # Agent Computer Browser Modes
 
 <p align="center">
-  <a href="https://github.com/kukudTian/agent-computer-browser-modes/stargazers"><img alt="GitHub stars" src="https://img.shields.io/github/stars/kukudTian/agent-computer-browser-modes?style=flat-square"></a>
+  <a href="https://github.com/Slaslin/agent-computer-browser-modes/stargazers"><img alt="GitHub stars" src="https://img.shields.io/github/stars/Slaslin/agent-computer-browser-modes?style=flat-square"></a>
   <img alt="Codex skill" src="https://img.shields.io/badge/Codex-Skill-111827?style=flat-square">
   <img alt="Microsoft Edge" src="https://img.shields.io/badge/Browser-Microsoft%20Edge-0078D7?style=flat-square">
   <img alt="Playwright MCP" src="https://img.shields.io/badge/Powered%20by-Playwright%20MCP-2EAD33?style=flat-square">
@@ -45,7 +45,7 @@ Agent Computer Browser Modes 是一个给 Codex 使用的浏览器控制 skill�
 环境要求：Windows、Codex desktop、Node.js 20+、Microsoft Edge。
 
 ```powershell
-git clone https://github.com/kukudTian/agent-computer-browser-modes.git
+git clone https://github.com/Slaslin/agent-computer-browser-modes.git
 cd agent-computer-browser-modes
 npm install
 npm run install-skill

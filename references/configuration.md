@@ -21,7 +21,8 @@ npm run install-skill
 
 The installer:
 
-1. Copies this repository to `%CODEX_HOME%\skills\browser-modes`.
+1. Copies this repository to
+   `%CODEX_HOME%\skills\agent-computer-browser-modes`.
 2. Backs up `%CODEX_HOME%\config.toml`.
 3. Replaces its managed configuration block with:
    - `browser_background`
@@ -59,8 +60,8 @@ The default Playwright CLI search order is:
 The installer only replaces the block between:
 
 ```text
-# >>> codex-browser-modes managed config
-# <<< codex-browser-modes managed config
+# >>> agent-computer-browser-modes managed config
+# <<< agent-computer-browser-modes managed config
 ```
 
 Other MCP servers and user configuration are left untouched.
@@ -68,7 +69,7 @@ Other MCP servers and user configuration are left untouched.
 ## Uninstall
 
 1. Remove the managed block from `%CODEX_HOME%\config.toml`.
-2. Remove `%CODEX_HOME%\skills\browser-modes`.
+2. Remove `%CODEX_HOME%\skills\agent-computer-browser-modes`.
 3. Optionally remove:
    - `%CODEX_HOME%\browser-profiles\msedge-background`
    - `%CODEX_HOME%\browser-profiles\msedge-visible`
@@ -81,7 +82,7 @@ Other MCP servers and user configuration are left untouched.
 - If Edge reports that the profile is already in use, close the `msedge-visible`
   or `msedge-background` browser process before relaunching that mode.
 - If the overlay does not appear, confirm that
-  `%CODEX_HOME%\skills\browser-modes\scripts\cursor-overlay.js` exists and that
-  `browser_visible` includes it through `--init-script`.
+  `%CODEX_HOME%\skills\agent-computer-browser-modes\scripts\cursor-overlay.js`
+  exists and that `browser_visible` includes it through `--init-script`.
 - If the real cursor still appears in a recording, disable the recorder's
   pointer capture or restrict the capture to the browser content area.

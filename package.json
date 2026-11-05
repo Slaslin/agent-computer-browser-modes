@@ -1,12 +1,12 @@
 {
-  "name": "codex-browser-modes",
+  "name": "agent-computer-browser-modes",
   "version": "0.1.0",
   "description": "Dual-mode Edge automation for Codex: silent headless browsing and a visible recording-friendly cursor.",
   "author": "KukudTian",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/kukudTian/codex-browser-modes.git"
+    "url": "https://github.com/kukudTian/agent-computer-browser-modes.git"
   },
   "type": "module",
   "private": true,

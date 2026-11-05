@@ -15,8 +15,8 @@ import path from "node:path";
 import process from "node:process";
 import { fileURLToPath } from "node:url";
 
-const START_MARKER = "# >>> codex-browser-modes managed config";
-const END_MARKER = "# <<< codex-browser-modes managed config";
+const START_MARKER = "# >>> agent-computer-browser-modes managed config";
+const END_MARKER = "# <<< agent-computer-browser-modes managed config";
 const here = path.dirname(fileURLToPath(import.meta.url));
 const repoRoot = path.resolve(here, "..");
 
@@ -273,7 +273,8 @@ async function main() {
 
   const codexHome = process.env.CODEX_HOME || path.join(os.homedir(), ".codex");
   const skillDir = path.resolve(
-    options.skillDir || path.join(codexHome, "skills", "browser-modes"),
+    options.skillDir ||
+      path.join(codexHome, "skills", "agent-computer-browser-modes"),
   );
   const configPath = path.resolve(
     options.config || path.join(codexHome, "config.toml"),

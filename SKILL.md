@@ -1,9 +1,9 @@
 ---
-name: browser-modes
-description: "Automate Microsoft Edge in either silent background mode or visible cursor mode. Use when a browser task should run without taking focus, or when the user should be able to watch mouse movement, clicks, focus changes, and page navigation."
+name: agent-computer-browser-modes
+description: "Give an AI agent dual-mode Microsoft Edge control: silent headless browser automation in the background, or a visible, recording-friendly virtual cursor that shows movement, clicks, focus changes, and page navigation."
 ---
 
-# Browser Modes
+# Agent Computer Browser Modes
 
 Use the installed MCP servers according to whether the task should be hidden or
 observable.

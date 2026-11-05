@@ -17,6 +17,7 @@ const requiredFiles = [
   "references/cursor-behavior.md",
   "scripts/cursor-overlay.js",
   "scripts/install.mjs",
+  "scripts/iframe-test.html",
   "scripts/smoke-test.html",
   "scripts/smoke-test.mjs",
 ];

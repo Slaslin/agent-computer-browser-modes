@@ -19,6 +19,19 @@ The overlay uses three practical states:
    - Virtual cursor: visible for the action
    - Native cursor over browser chrome and Windows remains unaffected
 
+## Frames
+
+Every frame receives the overlay, but only one frame may display the virtual
+cursor at a time.
+
+- A child frame posts frame activity to its parent.
+- The parent hides its local cursor while a child owns the pointer.
+- Nested frames relay the same ownership message to the top-level document.
+- Frame tokens prevent stale enter and leave messages from hiding the wrong
+  cursor.
+- Child-frame boxes are frame-local. Add the iframe origin before using a
+  top-level coordinate mouse action.
+
 ## Movement Rules
 
 - Real pointer movement inside the page must not be interpolated. Updating the
@@ -29,6 +42,15 @@ The overlay uses three practical states:
   pointer leave from the document root changes the state.
 - Starting agent movement cancels any previous animation.
 - User takeover cancels pending animation and settle timers.
+
+## File Choosers
+
+An upload button may not expose a visible `input[type=file]` because JavaScript
+can open the browser chooser directly.
+
+- Use `browser_file_upload` with an approved absolute path to continue.
+- Use `browser_file_upload` with an empty `paths` array to cancel.
+- Resolve the chooser before scrolling, clicking, or taking another action.
 
 ## Recording
 

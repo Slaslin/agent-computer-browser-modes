@@ -90,6 +90,7 @@ replaces only its own marked configuration block.
 | Keeps browser work from stealing focus | Yes | No | Yes in background mode |
 | Uses the real Windows pointer | No | Yes | No |
 | One visible cursor inside page content | N/A | Not guaranteed | Yes |
+| One virtual cursor across iframe boundaries | N/A | Not guaranteed | Yes |
 | Recording-friendly page interaction | No | Often produces duplicate cursors | Yes |
 | Returns native cursor over browser chrome | N/A | N/A | Yes |
 
@@ -177,6 +178,8 @@ Chrome support is a planned configuration extension.
   `scripts/cursor-overlay.js` through `--init-script`.
 - **Duplicate cursor in a recording:** disable system-pointer capture in the
   recorder or record the page content instead of the full display.
+- **Upload button appears unresponsive:** the click may have opened a native
+  file chooser. Use `browser_file_upload` to select a file or cancel the modal.
 
 More detail: [configuration](references/configuration.md) and
 [cursor behavior](references/cursor-behavior.md).
@@ -189,8 +192,8 @@ npm run validate
 ```
 
 The smoke test covers virtual cursor display, native cursor suppression, real
-pointer tracking, child-element transitions, page exit and re-entry, and actual
-page clicks.
+pointer tracking, child-element transitions, iframe cursor ownership, page exit
+and re-entry, and actual page clicks.
 
 ## Contributing
 

@@ -4,6 +4,11 @@
   Object.defineProperty(window, INSTALL_KEY, { value: true });
 
   const HOST_ID = "codex-visual-cursor-host";
+  const FRAME_MESSAGE = "__codex_visual_cursor_frame_state__";
+  const isTopFrame = window === window.top;
+  const frameToken =
+    globalThis.crypto?.randomUUID?.() ??
+    `frame-${Date.now()}-${Math.random().toString(16).slice(2)}`;
   let host = null;
   let shadow = null;
   let cursor = null;
@@ -13,6 +18,8 @@
   let settleTimer = 0;
   let virtualCursorActive = false;
   let boundaryListenersAttached = false;
+  let activeChildToken = null;
+  let lastChildAnnouncement = 0;
   let currentX = window.innerWidth / 2;
   let currentY = window.innerHeight / 2;
   let targetX = currentX;
@@ -146,8 +153,10 @@
     document.documentElement.addEventListener(
       "pointerenter",
       (event) => {
+        if (isTopFrame && activeChildToken != null) return;
         suppressSystemCursor();
         setCursorPosition(event.clientX, event.clientY);
+        announceChildState(true);
       },
       { passive: true },
     );
@@ -155,6 +164,11 @@
     document.documentElement.addEventListener(
       "pointerleave",
       () => {
+        announceChildState(false);
+        if (isTopFrame && activeChildToken != null) {
+          hideLocalCursor();
+          return;
+        }
         hideVirtualCursor();
       },
       { passive: true },
@@ -179,7 +193,7 @@
     cursor.style.transform = `translate3d(${x - 3}px, ${y - 3}px, 0)`;
   }
 
-  function hideVirtualCursor() {
+  function hideLocalCursor() {
     cancelAnimationFrame(animationFrame);
     clearTimeout(settleTimer);
     animationFrame = 0;
@@ -187,7 +201,19 @@
     virtualCursorActive = false;
     if (cursor) cursor.style.opacity = "0";
     focusRing?.classList.remove("visible");
+  }
+
+  function hideVirtualCursor() {
+    hideLocalCursor();
     restoreSystemCursor();
+  }
+
+  function announceChildState(active, token = frameToken) {
+    if (isTopFrame || window.parent === window) return;
+    const now = performance.now();
+    if (active && now - lastChildAnnouncement < 220) return;
+    lastChildAnnouncement = now;
+    window.parent.postMessage({ active, token, type: FRAME_MESSAGE }, "*");
   }
 
   function easeOutCubic(t) {
@@ -312,12 +338,14 @@
   window.addEventListener(
     "pointermove",
     (event) => {
+      if (isTopFrame && activeChildToken != null) return;
       cancelAnimationFrame(animationFrame);
       clearTimeout(settleTimer);
       targetX = event.clientX;
       targetY = event.clientY;
       suppressSystemCursor();
       setCursorPosition(event.clientX, event.clientY);
+      announceChildState(true);
     },
     { capture: true, passive: true },
   );
@@ -325,6 +353,7 @@
   window.addEventListener(
     "pointerdown",
     (event) => {
+      announceChildState(true);
       addTrail(event.clientX, event.clientY);
       pulse(event.clientX, event.clientY);
     },
@@ -334,6 +363,7 @@
   window.addEventListener(
     "click",
     (event) => {
+      announceChildState(true);
       pulse(event.clientX, event.clientY);
     },
     { capture: true, passive: true },
@@ -367,6 +397,29 @@
       setCursorPosition(targetX, targetY);
     }
   });
+
+  window.addEventListener("message", (event) => {
+    if (event.source == null || event.source === window) return;
+    if (event.data?.type !== FRAME_MESSAGE) return;
+    if (typeof event.data.token !== "string") return;
+
+    if (event.data.active === true) {
+      activeChildToken = event.data.token;
+      hideLocalCursor();
+      suppressSystemCursor();
+      if (!isTopFrame) announceChildState(true, event.data.token);
+    } else if (
+      event.data.active === false &&
+      event.data.token === activeChildToken
+    ) {
+      activeChildToken = null;
+      if (!isTopFrame) announceChildState(false, event.data.token);
+    }
+  });
+
+  if (!isTopFrame) {
+    window.addEventListener("pagehide", () => announceChildState(false));
+  }
 
   Object.defineProperty(window, "__codexVisualCursor", {
     configurable: false,

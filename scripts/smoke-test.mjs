@@ -7,6 +7,7 @@ const { chromium } = await import("playwright");
 const here = path.dirname(fileURLToPath(import.meta.url));
 const overlayPath = path.join(here, "cursor-overlay.js");
 const pagePath = path.join(here, "smoke-test.html");
+const iframePagePath = path.join(here, "iframe-test.html");
 const screenshotPath = path.join(here, "..", "test-output", "smoke-test.png");
 await mkdir(path.dirname(screenshotPath), { recursive: true });
 
@@ -185,6 +186,84 @@ if (
   );
 }
 
+const framePage = await context.newPage();
+await framePage.goto(pathToFileURL(iframePagePath).href);
+const frameElement = await framePage.locator("#content").elementHandle();
+const childFrame = await frameElement?.contentFrame();
+if (!childFrame) throw new Error("Iframe smoke-test frame did not load");
+await framePage.waitForTimeout(800);
+
+await childFrame.evaluate(() => {
+  window.dispatchEvent(
+    new PointerEvent("pointermove", {
+      bubbles: true,
+      clientX: 200,
+      clientY: 150,
+    }),
+  );
+});
+await framePage.waitForTimeout(300);
+
+const readFrameCursor = async (target) =>
+  target.evaluate(() => {
+    const host = document.querySelector("#codex-visual-cursor-host");
+    const cursor = host?.shadowRoot?.querySelector(".codex-cursor");
+    return {
+      bodyCursor: getComputedStyle(document.body).cursor,
+      cursorOpacity: cursor ? getComputedStyle(cursor).opacity : null,
+      nativeCursorHidden: document.documentElement.classList.contains(
+        "codex-visual-cursor-active",
+      ),
+    };
+  });
+
+const frameActiveState = {
+  parent: await readFrameCursor(framePage),
+  child: await readFrameCursor(childFrame),
+};
+
+if (
+  Number(frameActiveState.parent.cursorOpacity) > 0.05 ||
+  frameActiveState.child.cursorOpacity !== "1" ||
+  !frameActiveState.child.nativeCursorHidden
+) {
+  throw new Error(
+    `Iframe should own the only visible cursor: ${JSON.stringify(frameActiveState)}`,
+  );
+}
+
+await childFrame.evaluate(() => {
+  document.documentElement.dispatchEvent(
+    new PointerEvent("pointerleave", { bubbles: false }),
+  );
+});
+await framePage.waitForTimeout(100);
+await framePage.evaluate(() => {
+  window.dispatchEvent(
+    new PointerEvent("pointermove", {
+      bubbles: true,
+      clientX: 80,
+      clientY: 80,
+    }),
+  );
+});
+await framePage.waitForTimeout(220);
+
+const frameExitState = {
+  parent: await readFrameCursor(framePage),
+  child: await readFrameCursor(childFrame),
+};
+
+if (
+  frameExitState.parent.cursorOpacity !== "1" ||
+  !frameExitState.parent.nativeCursorHidden ||
+  Number(frameExitState.child.cursorOpacity) > 0.05
+) {
+  throw new Error(
+    `Leaving an iframe should restore the parent cursor: ${JSON.stringify(frameExitState)}`,
+  );
+}
+
 const backgroundPage = await context.newPage();
 await backgroundPage.goto("about:blank");
 await backgroundPage.bringToFront();
@@ -216,6 +295,8 @@ console.log(
       childLeaveState,
       pointerLeftState,
       pointerReturnedState,
+      frameActiveState,
+      frameExitState,
       backgroundState,
       screenshotPath,
     },

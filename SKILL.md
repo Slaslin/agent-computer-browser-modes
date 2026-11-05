@@ -42,6 +42,8 @@ Use `browser_visible` tools:
 1. Call `browser_snapshot` with `boxes: true`.
 2. Compute the center of the target:
    `x = box[0] + box[2] / 2`, `y = box[1] + box[3] / 2`.
+   If the target is inside an iframe, add the iframe's top-left origin before
+   using a top-level mouse action. Child-frame boxes are frame-local.
 3. Animate the virtual cursor to the target:
 
    ```js
@@ -55,6 +57,11 @@ Use `browser_visible` tools:
 Do not use `browser_mouse_move_xy` to drive the virtual pointer. Real mouse
 movement and agent pointer events share the same browser events. Explicit
 `moveTo` calls keep agent movement intentional and predictable.
+
+Iframe overlays coordinate through `postMessage`. The parent cursor hides while
+a child frame owns the pointer, so only one virtual cursor is visible across
+same-origin or cross-origin frames. Refresh the snapshot after scrolling an
+iframe because its child boxes use frame-local coordinates.
 
 While the real pointer is inside page content, the overlay hides the native page
 cursor and shows one virtual cursor. Real pointer movement updates immediately.
@@ -71,6 +78,20 @@ window.__codexVisualCursor.restoreSystemCursor()
 The cursor overlay is page content. A display recorder may still add its own
 system cursor overlay. For clean recordings, record the page or window and
 disable the recorder's pointer capture when that option exists.
+
+## File Uploads
+
+Clicking an upload control can open Playwright's native file chooser modal.
+While that modal is open, scrolling and clicking will fail.
+
+- If the user provided an absolute file path, call `browser_file_upload` with
+  that path immediately.
+- If they only asked to inspect the control or did not provide a path, call
+  `browser_file_upload` with an empty `paths` array to cancel the modal.
+- Do not issue more page actions until the file chooser is resolved.
+
+Uploading a personal file is a data transfer. Confirm the exact file and
+destination before uploading.
 
 ## Safety
 
